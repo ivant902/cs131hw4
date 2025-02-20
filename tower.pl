@@ -40,10 +40,43 @@ transpose(Matrix, [H|T]) :-
     maplist(get_tail, Matrix, End),
     transpose(End, T).
 
-ntower(N, T, C) :-
+check_counts(T,C) :-
+    check_counts(T, 0, 0, C). 
+
+check_counts([], _Max, Acc, Acc). 
+check_counts([H|T], Max, Acc, Count) :-
+    ( H > Max ->
+         NewAcc is Acc + 1,
+         NewMax is H
+    ;    NewAcc = Acc,
+         NewMax = Max
+    ),
+    check_counts(T, NewMax, NewAcc, Count).
+ 
+
+check_all_counts(T, counts(Top, Bottom, Left, Right)) :- 
+    maplist(check_counts, T, Left), 
+    maplist(reverse, T, TReversed),
+    maplist(check_counts, TReversed, Right),
+    transpose(T, Columns),
+    maplist(check_counts, Columns, Top),
+    maplist(reverse, Columns, RevColumns),
+    maplist(check_counts, RevColumns, Bottom).
+
+length_(N, Row) :- length(Row, N).
+
+permutation_of(Domain, Row) :-
+    permutation(Domain, Row).
+
+ntower(N, T, counts(Top, Bottom, Left, Right)) :-
     integer(N), N >= 0, 
-    check_size(N, T),
+    maplist(length_(N), T), 
+    listofNums(1, N, Domain),
+    maplist(permutation_of(Domain), T),
+    transpose(T, Cols),
     check_all_row_values(N, T),
-    transpose(T, Col),
-    check_all_col_values(N, Col).
+    check_all_col_values(N, Cols),
+    check_all_counts(T, counts(Top, Bottom, Left, Right)).
+
+
 
