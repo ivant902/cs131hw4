@@ -1,4 +1,3 @@
-
 check_size(N, T) :- 
     length(T, N),
     check_row_length(N,T).
@@ -20,12 +19,12 @@ check_row_values(N, Row) :-
     sort(Row, Sorted), 
     Sorted == List.
 
-check_all_row_values(N,[]).
+check_all_row_values(_N,[]).
 check_all_row_values(N,[H|T]) :-
     check_row_values(N,H),
     check_all_row_values(N,T).
 
-check_all_col_values(N, []).
+check_all_col_values(_N, []).
 check_all_col_values(N, [H|T]) :-
     check_row_values(N,H),
     check_all_col_values(N,T).
@@ -68,15 +67,30 @@ length_(N, Row) :- length(Row, N).
 permutation_of(Domain, Row) :-
     permutation(Domain, Row).
 
+append_rows([], []).
+append_rows([Row|Rows], All) :-
+    append(Row, Rest, All),
+    append_rows(Rows, Rest).
+
 ntower(N, T, counts(Top, Bottom, Left, Right)) :-
-    integer(N), N >= 0, 
-    maplist(length_(N), T), 
+    integer(N), N>=0,
+    length(T, N),
+    maplist(length_(N), T),
+    append_rows(T, Vars),
+    fd_domain(Vars, 1, N),
+    maplist(fd_all_different, T),
+    transpose(T, Columns),
+    maplist(fd_all_different, Columns),
+    fd_labeling(Vars),
+    check_all_counts(T, counts(Top, Bottom, Left, Right)).
+
+plain_ntower(N, T, counts(Top, Bottom, Left, Right)) :-
+    integer(N), N >= 0,
+    length(T, N),
+    maplist(length_(N), T),
     listofNums(1, N, Domain),
     maplist(permutation_of(Domain), T),
     transpose(T, Cols),
     check_all_row_values(N, T),
     check_all_col_values(N, Cols),
     check_all_counts(T, counts(Top, Bottom, Left, Right)).
-
-
-
