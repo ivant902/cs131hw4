@@ -72,7 +72,8 @@ append_rows([Row|Rows], All) :-
     append(Row, Rest, All),
     append_rows(Rows, Rest).
 
-ntower(N, T, counts(Top, Bottom, Left, Right)) :-
+ntower(N, T, C) :-
+    C = counts(Top, Bottom, Left, Right),
     integer(N), N>=0,
     length(T, N),
     maplist(length_(N), T),
@@ -84,7 +85,8 @@ ntower(N, T, counts(Top, Bottom, Left, Right)) :-
     fd_labeling(Vars),
     check_all_counts(T, counts(Top, Bottom, Left, Right)).
 
-plain_ntower(N, T, counts(Top, Bottom, Left, Right)) :-
+plain_ntower(N, T, C) :-
+    C = counts(Top, Bottom, Left, Right),
     integer(N), N >= 0,
     length(T, N),
     maplist(length_(N), T),
@@ -94,3 +96,31 @@ plain_ntower(N, T, counts(Top, Bottom, Left, Right)) :-
     check_all_row_values(N, T),
     check_all_col_values(N, Cols),
     check_all_counts(T, counts(Top, Bottom, Left, Right)).
+
+ambiguous(N, C, T1, T2) :-
+    ntower(N, T1, C),
+    ntower(N, T2, C),
+    T1 \= T2.
+
+run_tower(nResult) :-
+    statistics(cpu_time, [Start| _]),
+    ntower(5, T, counts(([2,3,2,1,4],
+                 [3,1,3,3,2],
+                 [4,1,2,5,2],
+                 [2,4,2,1,2]))), 
+    statistics(cpu_time, [End| _]),
+    nResult is End - Start.
+
+run_plain_tower(pResult) :-
+    statistics(cpu_time, [Start| _]),
+    plain_ntower(5, T, counts(([2,3,2,1,4],
+                 [3,1,3,3,2],
+                 [4,1,2,5,2],
+                 [2,4,2,1,2]))), 
+    statistics(cpu_time, [End| _]),
+    pResult is End - Start.
+
+speedup(Ratio) :-
+    run_tower(nResult),
+    run_plain_tower(pResult),
+    Ratio is pResult / nResult. 
