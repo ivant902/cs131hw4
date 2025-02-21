@@ -102,25 +102,27 @@ ambiguous(N, C, T1, T2) :-
     ntower(N, T2, C),
     T1 \= T2.
 
-run_tower(nResult) :-
+run_tower(X, 0) :- X is 0.
+run_tower(Result,N) :-
     statistics(cpu_time, [Start| _]),
-    ntower(4, T, counts([2,2,1,3],
-                 [3,2,2,1],
-                 [3,1,2,3],
-                 [2,2,3,1])), 
+    ntower(4, _T, counts([4, 3, 2, 1], [1, 2, 2, 2], [4, 3, 2, 1], [1, 2, 2, 2])), 
     statistics(cpu_time, [End| _]),
-    nResult is End - Start.
+    Result1 is End - Start,
+    N1 is N - 1,
+    run_tower(Result2, N1),
+    Result is Result1 + Result2.
 
-run_plain_tower(pResult) :-
+run_plain_tower(X, 0) :- X is 0.
+run_plain_tower(Result,N) :-    
     statistics(cpu_time, [Start| _]),
-    plain_ntower(4, T, counts([2,2,1,3],
-                              [3,2,2,1],
-                              [3,1,2,3],
-                              [2,2,3,1])), 
+    plain_ntower(4, _T, counts([4, 3, 2, 1], [1, 2, 2, 2], [4, 3, 2, 1], [1, 2, 2, 2])),  
     statistics(cpu_time, [End| _]),
-    pResult is End - Start.
+    Result1 is End - Start,
+    N1 is N - 1,
+    run_plain_tower(Result2, N1),
+    Result is Result1 + Result2.
 
 speedup(Ratio) :-
-    run_tower(nResult),
-    run_plain_tower(pResult),
-    Ratio is pResult / nResult. 
+    run_tower(NResult, 100),
+    run_plain_tower(PResult, 100),
+    Ratio is PResult / NResult. 
