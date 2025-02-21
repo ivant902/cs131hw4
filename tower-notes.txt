@@ -9,3 +9,10 @@ T2 = [[1,2,3,4,5],[3,1,4,5,2],[4,5,2,3,1],[2,4,5,1,3],[5,3,1,2,4]] ?
 (9016 ms) yes
 {1}
 
+Running the speedup query: 
+| ?- speedup(Ratio).
+
+We get the following result: 
+Ratio = 1487.2 
+
+This result is for n =4 and the test case has the edge count array hardcoded into it. 
